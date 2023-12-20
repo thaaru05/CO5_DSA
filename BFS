@@ -1,0 +1,106 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+#define MAX_NODES 100
+
+// Queue data structure for BFS
+struct Queue {
+    int items[MAX_NODES];
+    int front;
+    int rear;
+};
+
+// Function to initialize the queue
+void initQueue(struct Queue* q) {
+    q->front = -1;
+    q->rear = -1;
+}
+
+// Function to check if the queue is empty
+int isEmpty(struct Queue* q) {
+    return q->front == -1;
+}
+
+// Function to add an element to the rear of the queue
+void enqueue(struct Queue* q, int value) {
+    if (q->rear == MAX_NODES - 1) {
+        printf("Queue is full\n");
+    } else {
+        if (q->front == -1) {
+            q->front = 0;
+        }
+        q->rear++;
+        q->items[q->rear] = value;
+    }
+}
+
+// Function to remove an element from the front of the queue
+int dequeue(struct Queue* q) {
+    int value;
+    if (isEmpty(q)) {
+        printf("Queue is empty\n");
+        return -1;
+    } else {
+        value = q->items[q->front];
+        q->front++;
+        if (q->front > q->rear) {
+            q->front = q->rear = -1;
+        }
+        return value;
+    }
+}
+
+// Function to perform Breadth-First Search
+void BFS(int graph[MAX_NODES][MAX_NODES], int nodes, int start) {
+    // Array to keep track of visited nodes
+    int visited[MAX_NODES] = {0};
+
+    // Create a queue for BFS
+    struct Queue q;
+    initQueue(&q);
+
+    // Mark the start node as visited and enqueue it
+    visited[start] = 1;
+    enqueue(&q, start);
+
+    printf("Breadth-First Search starting from node %d:\n", start);
+
+    // BFS loop
+    while (!isEmpty(&q)) {
+        int current = dequeue(&q);
+        printf("%d ", current);
+
+        // Explore adjacent nodes
+        for (int i = 0; i < nodes; i++) {
+            if (graph[current][i] == 1 && !visited[i]) {
+                visited[i] = 1;
+                enqueue(&q, i);
+            }
+        }
+    }
+
+    printf("\n");
+}
+
+int main() {
+    int nodes, edges, start;
+    printf("Enter the number of nodes and edges: ");
+    scanf("%d %d", &nodes, &edges);
+
+    int graph[MAX_NODES][MAX_NODES] = {0};
+
+    printf("Enter the edges (format: node1 node2):\n");
+    for (int i = 0; i < edges; i++) {
+        int node1, node2;
+        scanf("%d %d", &node1, &node2);
+        graph[node1][node2] = 1;
+        graph[node2][node1] = 1;  // Assuming an undirected graph
+    }
+
+    printf("Enter the starting node for BFS: ");
+    scanf("%d", &start);
+
+    BFS(graph, nodes, start);
+
+    return 0;
+}
